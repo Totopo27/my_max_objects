@@ -25,6 +25,15 @@ void jweb_processor_daw_input(t_jweb_processor *x, t_symbol *s, long ac, t_atom 
 // Variable global para la clase
 static t_class *jweb_processor_class;
 
+// Función auxiliar para verificar si un string termina con otro string
+int str_ends_with(const char *str, const char *suffix) {
+    if (!str || !suffix) return 0;
+    size_t str_len = strlen(str);
+    size_t suffix_len = strlen(suffix);
+    if (suffix_len > str_len) return 0;
+    return strncmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
+}
+
 // Función principal
 void ext_main(void *r)
 {
@@ -103,15 +112,33 @@ void jweb_processor_anything(t_jweb_processor *x, t_symbol *s, long ac, t_atom *
         else if (atom_gettype(av) == A_SYM)
             id = atol(atom_getsym(av)->s_name);
             
-        if (atom_gettype(av + 1) == A_LONG)
+        if (atom_gettype(av + 1) == A_LONG) {
             velocity = atom_getlong(av + 1);
-        else if (atom_gettype(av + 1) == A_SYM) {
+        } else if (atom_gettype(av + 1) == A_SYM) {
             char *vel_str = atom_getsym(av + 1)->s_name;
-            if (strcmp(vel_str, "do") == 0)
-                velocity = 127;  // Note on
-            else
-                velocity = 0;    // Note off
+            
+            // Check if the string ends with "0"
+            if (str_ends_with(vel_str, "0")) {
+                velocity = 0;  // Note off
+            } else {
+                // Check for all possible note symbols
+                const char *note_symbols[] = {"do", "reb", "re", "mib", "mi", "fa", "fa#", "sol", "sol#", "la", "sib", "si", NULL};
+                int i = 0;
+                while (note_symbols[i] != NULL) {
+                    if (strstr(vel_str, note_symbols[i]) != NULL) {
+                        velocity = 127;  // Note on
+                        break;
+                    }
+                    i++;
+                }
+            }
         }
+        
+        // Debug output
+        object_post((t_object *)x, "Processing: id=%ld, symbol=%s, velocity=%ld", 
+                   id, 
+                   atom_gettype(av + 1) == A_SYM ? atom_getsym(av + 1)->s_name : "number",
+                   velocity);
         
         atom_setlong(output, id);
         atom_setlong(output + 1, velocity);
