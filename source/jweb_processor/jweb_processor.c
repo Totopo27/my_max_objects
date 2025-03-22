@@ -67,50 +67,36 @@ void jweb_processor_anything(t_jweb_processor *x, t_symbol *s, long argc, t_atom
         // Get the message type
         t_symbol *msg_type = atom_getsym(argv);
         
-        // Process click events
-        if (msg_type == gensym("click")) {
-            // We expect at least one more argument for the key ID
-            if (argc > 1 && atom_gettype(argv + 1) == A_LONG) {
+        // Process key events (both press and release)
+        if (argc >= 3 && 
+            (msg_type == gensym("click") || msg_type == gensym("release"))) {
+            // We expect key ID and velocity
+            if (atom_gettype(argv + 1) == A_LONG && atom_gettype(argv + 2) == A_LONG) {
                 long key_id = atom_getlong(argv + 1);
+                long velocity = atom_getlong(argv + 2);
                 t_atom out[2];
                 
-                // Output key ID and velocity 127 (press)
+                // Output key ID and velocity as received from jweb
                 atom_setlong(out, key_id);
-                atom_setlong(out + 1, 127);
-                outlet_list(x->outlet, NULL, 2, out);
-            }
-        }
-        // Process release events
-        else if (msg_type == gensym("release")) {
-            // We expect at least one more argument for the key ID
-            if (argc > 1 && atom_gettype(argv + 1) == A_LONG) {
-                long key_id = atom_getlong(argv + 1);
-                t_atom out[2];
-                
-                // Output key ID and velocity 0 (release)
-                atom_setlong(out, key_id);
-                atom_setlong(out + 1, 0);
+                atom_setlong(out + 1, velocity);
                 outlet_list(x->outlet, NULL, 2, out);
             }
         }
         // Process chord events
-        else if (msg_type == gensym("chord")) {
-            // We expect at least two more arguments: event type and array of key IDs
-            if (argc > 2) {
-                t_symbol *event_type = atom_getsym(argv + 1);
-                long velocity = (event_type == gensym("pressed")) ? 127 : 0;
-                
-                // Process each key ID in the chord
-                for (long i = 2; i < argc; i++) {
-                    if (atom_gettype(argv + i) == A_LONG) {
-                        long key_id = atom_getlong(argv + i);
-                        t_atom out[2];
-                        
-                        // Output key ID and velocity
-                        atom_setlong(out, key_id);
-                        atom_setlong(out + 1, velocity);
-                        outlet_list(x->outlet, NULL, 2, out);
-                    }
+        else if (msg_type == gensym("chord") && argc >= 3) {
+            t_symbol *event_type = atom_getsym(argv + 1);
+            long velocity = (event_type == gensym("pressed")) ? 127 : 0;
+            
+            // Process each key ID in the chord
+            for (long i = 2; i < argc; i++) {
+                if (atom_gettype(argv + i) == A_LONG) {
+                    long key_id = atom_getlong(argv + i);
+                    t_atom out[2];
+                    
+                    // Output key ID and velocity
+                    atom_setlong(out, key_id);
+                    atom_setlong(out + 1, velocity);
+                    outlet_list(x->outlet, NULL, 2, out);
                 }
             }
         }
