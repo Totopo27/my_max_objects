@@ -74,9 +74,9 @@ void jweb_processor_anything(t_jweb_processor *x, t_symbol *s, long argc, t_atom
                 long key_id = atom_getlong(argv + 1);
                 t_atom out[2];
                 
-                // Output key ID and velocity 1 (press)
+                // Output key ID and velocity 127 (press)
                 atom_setlong(out, key_id);
-                atom_setlong(out + 1, 1);
+                atom_setlong(out + 1, 127);
                 outlet_list(x->outlet, NULL, 2, out);
             }
         }
@@ -98,7 +98,7 @@ void jweb_processor_anything(t_jweb_processor *x, t_symbol *s, long argc, t_atom
             // We expect at least two more arguments: event type and array of key IDs
             if (argc > 2) {
                 t_symbol *event_type = atom_getsym(argv + 1);
-                long velocity = (event_type == gensym("pressed")) ? 1 : 0;
+                long velocity = (event_type == gensym("pressed")) ? 127 : 0;
                 
                 // Process each key ID in the chord
                 for (long i = 2; i < argc; i++) {
