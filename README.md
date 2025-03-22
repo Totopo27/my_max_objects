@@ -1,56 +1,60 @@
 # My Max Objects
 
-This repository contains custom Max objects developed for specific audio and music processing needs.
+A collection of Max/MSP external objects for microtonal synthesis and web interaction.
 
 ## Objects
 
 ### temperaments
-A Max object for microtonal frequency calculations. Supports various temperaments (19-TET, 31-TET, 41-TET, 53-TET) and provides frequency output based on key IDs.
+
+A microtonal synthesis object that calculates frequencies based on different equal temperaments.
 
 Features:
-- Multiple temperament support (19, 31, 41, 53)
+- Supports multiple temperaments (19-EDO, 31-EDO, 41-EDO, 53-EDO)
 - Real-time frequency calculation
-- Integration with jweb interface
-- Polyphonic support
+- Velocity-sensitive output
+- Base frequency configuration
 
 ### jweb_processor
-A helper object that processes messages from jweb objects to work with the temperaments object.
+
+A helper object that processes messages from the `jweb` object to work with the `temperaments` object.
 
 Features:
-- Converts jweb click events to key ID + velocity pairs
-- Handles both press and release events
-- Clean message formatting for temperaments object
+- Filters unwanted messages
+- Converts jweb key events to proper velocity values
+- Supports both HTML and DAW velocity inputs
+- Seamless integration with `temperaments`
 
 ## Building
 
-### Requirements
-- CMake 3.19 or higher
-- Max SDK
-- C compiler (Visual Studio 2019 or higher on Windows, Xcode on macOS)
-
-### Build Steps
-1. Clone this repository
-2. Set up the Max SDK
-3. Configure with CMake:
+1. Clone the Max SDK
+2. Copy the source folders to `max-sdk-base/source/`
+3. Run CMake:
    ```bash
-   cmake -B build -S .
+   cd max-sdk-base/build
+   cmake ..
+   cmake --build . --config Release
    ```
-4. Build:
-   ```bash
-   cmake --build build --config Release
-   ```
-5. Copy the resulting .mxe64 files to your Max externals folder
+4. Copy the resulting `.mxe64` files to your Max externals folder:
+   - `temperaments.mxe64`
+   - `jweb_processor.mxe64`
 
 ## Installation
-Copy the compiled objects (.mxe64 on Windows, .mxo on Mac) to:
-- Windows: `C:\Program Files\Cycling '74\Max 8\resources\packages\max-mxj\java-classes\lib\`
-- Mac: `/Applications/Max.app/Contents/Resources/C74/packages/max-mxj/java-classes/lib/`
+
+Copy the compiled externals to:
+```
+C:\Program Files\Cycling '74\Max 8\resources\packages\max-mxj\java-classes\lib\
+```
 
 ## Usage
-See the help files (temperaments.maxhelp and jweb_processor.maxhelp) for detailed usage instructions.
+
+See the help files in Max for detailed usage instructions:
+- `temperaments.maxhelp`
+- `jweb_processor.maxhelp`
 
 ## License
+
 MIT License
 
 ## Author
+
 Totopo27
