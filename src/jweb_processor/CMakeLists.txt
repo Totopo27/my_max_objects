@@ -1,7 +1,7 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../max-sdk-base/script/max-pretarget.cmake)
 
-# Name of the external
-set(PROJECT_NAME jweb_processor)
+# Name of the project
+set(PROJECT_NAME "jweb_processor")
 
 # Add source files
 add_library(
@@ -17,7 +17,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	"${MAX_SDK_JIT_INCLUDES}"
 )
 
-# Link with Max SDK libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE ${MAX_SDK_LIBS})
+# Windows and macOS specific settings
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PUBLIC "${MAX_SDK_LIBS}")
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".mxe64")
+elseif(APPLE)
+    target_link_libraries(${PROJECT_NAME} PUBLIC "${MAX_SDK_LIBS}")
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".mxo")
+endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../max-sdk-base/script/max-posttarget.cmake)

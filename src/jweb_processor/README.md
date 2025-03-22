@@ -1,46 +1,75 @@
 # jweb_processor
 
-A Max external object that processes messages from the `jweb` object to work seamlessly with the `temperaments` object.
+A Max/MSP external object that processes messages from the `jweb` object, specifically designed to work with the `temperaments` object for microtonal synthesis.
 
 ## Features
 
-- Filters out unwanted messages (title, url, etc.)
-- Converts jweb key events to proper velocity values:
-  - "id do" → "id 127" (note on)
-  - "id 0" → "id 0" (note off)
-- Supports two velocity sources:
-  - HTML input (default)
-  - DAW input
-
-## Inlets
-
-1. Left inlet: Messages from jweb (list)
-2. Right inlet: DAW velocity input (list)
-
-## Outlet
-
-- Outputs processed messages as "id velocity" pairs
-
-## Messages
-
-- `int 1`: Use HTML velocity (default)
-- `int 2`: Use DAW velocity
-- Lists in format: `id velocity`
-
-## Usage Example
-
-```
-[jweb] -> [jweb_processor] -> [temperaments]
-```
+- Filters unwanted messages from `jweb` object
+- Processes key press and release events
+- Converts messages to proper velocity values (127 for press, 0 for release)
+- Supports both HTML and DAW input modes
+- Provides detailed debug output for troubleshooting
 
 ## Building
 
-1. Clone the Max SDK
-2. Copy the `jweb_processor` folder to `max-sdk-base/source/`
-3. Run CMake:
-   ```bash
-   cd max-sdk-base/build
-   cmake ..
-   cmake --build . --config Release
-   ```
-4. Copy the resulting `jweb_processor.mxe64` to your Max externals folder
+### Requirements
+
+- CMake 3.19 or higher
+- Max SDK
+- C compiler (Visual Studio 2019 or later for Windows, Xcode for macOS)
+
+### Build Steps
+
+1. Clone this repository
+2. Set up the Max SDK path in CMake
+3. Run CMake to generate build files
+4. Build the project
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+```
+
+## Installation
+
+1. Copy the compiled external (`jweb_processor.mxe64` for Windows or `jweb_processor.mxo` for macOS) to your Max externals folder
+2. Restart Max
+
+## Usage
+
+1. Create a `jweb_processor` object in your Max patch
+2. Connect the output of your `jweb` object to the left inlet of `jweb_processor`
+3. Connect the output of `jweb_processor` to the input of the `temperaments` object
+
+### Inlets
+
+- Left inlet: Messages from `jweb` object
+- Right inlet: DAW velocity input (optional)
+
+### Outlets
+
+- Output: Processed messages (list: id velocity)
+
+### Messages
+
+- `1`: Set to HTML velocity mode (default)
+- `2`: Set to DAW velocity mode
+
+## Debug Output
+
+The object provides detailed debug output in the Max console, showing:
+- Message ID
+- Number of arguments
+- Type of the third argument
+- Value of the third argument
+- Final calculated velocity
+
+## License
+
+MIT License
+
+## Author
+
+Totopo27
